@@ -4,6 +4,7 @@ import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
 import { Strategy as GithubStrategy } from 'passport-github2';
 import { Strategy as LinkedinStrategy } from 'passport-linkedin-oauth2';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
+import { Strategy as FacebookStrategy } from 'passport-facebook';
 import User from '../models/User';
 
 const socialAuth = () => {
@@ -26,9 +27,9 @@ const socialAuth = () => {
     }, (token, refreshToken, profile, cb) => {
       process.nextTick(async () => {
         const user = {
-          name: profile._json.name,
-          email: profile._json.email,
-          picture: profile._json.picture.replace('=s96-c', ''),
+          name: profile.displayName,
+          email: profile.emails[0].value,
+          picture: profile.photos[0].value.replace('=s96-c', ''),
           active: true,
         };
         let userInfo = await User.findOne({ email: user.email });
@@ -53,9 +54,9 @@ const socialAuth = () => {
     }, (token, refreshToken, profile, cb) => {
       process.nextTick(async () => {
         const user = {
-          name: profile._json.name,
+          name: profile.displayName,
           email: profile.emails[0].value,
-          picture: profile._json.avatar_url,
+          picture: profile.photos[0].value,
           active: true,
         };
         let userInfo = await User.findOne({ email: user.email });
@@ -107,9 +108,35 @@ const socialAuth = () => {
     }, (token, refreshToken, profile, cb) => {
       process.nextTick(async () => {
         const user = {
-          name: profile._json.name,
-          email: profile._json.email,
-          picture: profile._json.profile_image_url.replace('_normal', ''),
+          name: profile.displayName,
+          email: profile.emails[0].value,
+          picture: profile.photos[0].value.replace('_normal', ''),
+          active: true,
+        };
+        let userInfo = await User.findOne({ email: user.email });
+        if (!userInfo) {
+          userInfo = await User.create(user);
+        } else {
+          userInfo.name = user.name;
+          userInfo.picture = user.picture;
+        }
+        return cb(null, userInfo);
+      });
+    },
+  ));
+
+  passport.use(new FacebookStrategy(
+    {
+      clientID: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+      callbackURL: process.env.FACEBOOK_CALLBACK_URL,
+      profileFields: ['email', 'displayName', 'picture.type(large)'],
+    }, (accessToken, refreshToken, profile, cb) => {
+      process.nextTick(async () => {
+        const user = {
+          name: profile.displayName,
+          email: profile.emails[0].value,
+          picture: profile.photos[0].value,
           active: true,
         };
         let userInfo = await User.findOne({ email: user.email });

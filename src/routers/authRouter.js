@@ -67,6 +67,17 @@ router.get('/twitter/callback',
     },
   ));
 
+router.get('/facebook',
+  passport.authenticate('facebook'));
+
+router.get('/facebook/callback',
+  passport.authenticate(
+    'facebook', {
+      successRedirect: '/api/v1/auth/success',
+      failureRedirect: '/api/v1/auth/fail',
+    },
+  ));
+
 router.get('/success', (req, res) => res.json({
   data: req.user,
 }));
