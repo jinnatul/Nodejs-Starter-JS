@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema({
   passwordResetExpires: Date,
   active: {
     type: Boolean,
-    default: true,
+    default: false,
     select: false,
   },
 });
@@ -51,7 +51,7 @@ userSchema.pre('save', async function (next) {
 });
 
 // get User from email
-userSchema.pre('save', function(next) {
+userSchema.pre('save', function (next) {
   this.userName = this.email.match(/^([^@]*)@/)[1];
   next();
 });

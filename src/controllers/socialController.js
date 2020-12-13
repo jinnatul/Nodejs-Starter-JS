@@ -29,6 +29,31 @@ const socialAuth = () => {
           name: profile._json.name,
           email: profile._json.email,
           picture: profile._json.picture.replace('=s96-c', ''),
+          active: true,
+        };
+        let userInfo = await User.findOne({ email: user.email });
+        if (!userInfo) {
+          userInfo = await User.create(user);
+        }
+        return cb(null, userInfo);
+      });
+    },
+  ));
+
+  // Github
+  passport.use(new GithubStrategy(
+    {
+      clientID: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      callbackURL: process.env.GITHUB_CALLBACK_URL,
+      scope: ['user:email'],
+    }, (token, refreshToken, profile, cb) => {
+      process.nextTick(async () => {
+        const user = {
+          name: profile._json.name,
+          email: profile.emails[0].value,
+          picture: profile._json.avatar_url,
+          active: true,
         };
         let userInfo = await User.findOne({ email: user.email });
         if (!userInfo) {
