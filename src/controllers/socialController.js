@@ -34,6 +34,9 @@ const socialAuth = () => {
         let userInfo = await User.findOne({ email: user.email });
         if (!userInfo) {
           userInfo = await User.create(user);
+        } else {
+          userInfo.name = user.name;
+          userInfo.picture = user.picture;
         }
         return cb(null, userInfo);
       });
@@ -58,6 +61,9 @@ const socialAuth = () => {
         let userInfo = await User.findOne({ email: user.email });
         if (!userInfo) {
           userInfo = await User.create(user);
+        } else {
+          userInfo.name = user.name;
+          userInfo.picture = user.picture;
         }
         return cb(null, userInfo);
       });
@@ -82,6 +88,36 @@ const socialAuth = () => {
         let userInfo = await User.findOne({ email: user.email });
         if (!userInfo) {
           userInfo = await User.create(user);
+        } else {
+          userInfo.name = user.name;
+          userInfo.picture = user.picture;
+        }
+        return cb(null, userInfo);
+      });
+    },
+  ));
+
+  // Twitter
+  passport.use(new TwitterStrategy(
+    {
+      consumerKey: process.env.TWITTER_CLIENT_ID,
+      consumerSecret: process.env.TWITTER_CLIENT_SECRET,
+      callbackURL: process.env.TWITTER_CALLBACK_URL,
+      includeEmail: true,
+    }, (token, refreshToken, profile, cb) => {
+      process.nextTick(async () => {
+        const user = {
+          name: profile._json.name,
+          email: profile._json.email,
+          picture: profile._json.profile_image_url.replace('_normal', ''),
+          active: true,
+        };
+        let userInfo = await User.findOne({ email: user.email });
+        if (!userInfo) {
+          userInfo = await User.create(user);
+        } else {
+          userInfo.name = user.name;
+          userInfo.picture = user.picture;
         }
         return cb(null, userInfo);
       });

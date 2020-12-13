@@ -52,6 +52,21 @@ router.get('/linkedin/callback',
     },
   ));
 
+/* Twitter */
+// send to twitter to do the authentication
+// profile gets us their basic information including their name
+// email gets their emails
+router.get('/twitter',
+  passport.authenticate('twitter'));
+
+router.get('/twitter/callback',
+  passport.authenticate(
+    'twitter', {
+      successRedirect: '/api/v1/auth/success',
+      failureRedirect: '/api/v1/auth/fail',
+    },
+  ));
+
 router.get('/success', (req, res) => res.json({
   data: req.user,
 }));
