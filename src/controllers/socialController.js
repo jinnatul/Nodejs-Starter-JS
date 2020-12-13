@@ -63,6 +63,30 @@ const socialAuth = () => {
       });
     },
   ));
+
+  // Linkedin
+  passport.use(new LinkedinStrategy(
+    {
+      clientID: process.env.LINKEDIN_CLIENT_ID,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+      callbackURL: process.env.LINKEDIN_CALLBACK_URL,
+      scope: ['r_emailaddress', 'r_liteprofile'],
+    }, (token, refreshToken, profile, cb) => {
+      process.nextTick(async () => {
+        const user = {
+          name: profile.displayName,
+          email: profile.emails[0].value,
+          picture: profile.photos[3].value,
+          active: true,
+        };
+        let userInfo = await User.findOne({ email: user.email });
+        if (!userInfo) {
+          userInfo = await User.create(user);
+        }
+        return cb(null, userInfo);
+      });
+    },
+  ));
 };
 
 export default socialAuth;
