@@ -11,11 +11,23 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, 'Provide your email'],
     unique: true,
     lowercase: true,
   },
-  picture: String,
+  picture: {
+    type: String,
+  },
+  phone: {
+    type: String,
+  },
+  otp: {
+    type: String,
+    select: false,
+  },
+  createdAtOTP: {
+    type: Date,
+    select: false,
+  },
   role: {
     type: String,
     enum: ['user', 'admin'],
@@ -51,10 +63,10 @@ userSchema.pre('save', async function (next) {
 });
 
 // get User from email
-userSchema.pre('save', function (next) {
-  this.userName = this.email.match(/^([^@]*)@/)[1];
-  next();
-});
+// userSchema.pre('save', function (next) {
+//   this.userName = this.email.match(/^([^@]*)@/)[1];
+//   next();
+// });
 
 if (!mongoose.models.User) {
   mongoose.model('User', userSchema);

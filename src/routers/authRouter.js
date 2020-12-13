@@ -1,5 +1,9 @@
 import express from 'express';
 import passport from 'passport';
+import {
+  smsAuthentication,
+  smsVerify
+} from '../controllers/authController';
 
 const router = express.Router();
 
@@ -67,6 +71,11 @@ router.get('/facebook/callback',
     },
   ));
 
+// Phone verification
+router.post('/sms', smsAuthentication);
+router.post('/sms/verify', smsVerify);
+
+/* Social authentication */
 router.get('/success', (req, res) => res.json({
   data: req.user,
 }));
