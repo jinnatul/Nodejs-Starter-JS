@@ -3,10 +3,7 @@ import passport from 'passport';
 
 const router = express.Router();
 
-/* Google */
-// send to google to do the authentication
-// profile gets us their basic information including their name
-// email gets their emails
+// Google
 router.get('/google',
   passport.authenticate(
     'google', {
@@ -22,10 +19,7 @@ router.get('/google/callback',
     },
   ));
 
-/* Github */
-// send to github to do the authentication
-// profile gets us their basic information including their name
-// email gets their emails
+// Github
 router.get('/github',
   passport.authenticate('github'));
 
@@ -37,10 +31,7 @@ router.get('/github/callback',
     },
   ));
 
-/* Linkedin */
-// send to linkedin to do the authentication
-// profile gets us their basic information including their name
-// email gets their emails
+// Linkedin
 router.get('/linkedin',
   passport.authenticate('linkedin'));
 
@@ -52,10 +43,7 @@ router.get('/linkedin/callback',
     },
   ));
 
-/* Twitter */
-// send to twitter to do the authentication
-// profile gets us their basic information including their name
-// email gets their emails
+// Twitter
 router.get('/twitter',
   passport.authenticate('twitter'));
 
@@ -67,6 +55,7 @@ router.get('/twitter/callback',
     },
   ));
 
+// Facebook
 router.get('/facebook',
   passport.authenticate('facebook'));
 

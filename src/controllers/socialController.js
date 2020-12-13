@@ -6,6 +6,9 @@ import { Strategy as LinkedinStrategy } from 'passport-linkedin-oauth2';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
 import User from '../models/User';
+import {
+  createJWT,
+} from '../middlewares/jwtToken';
 
 const socialAuth = () => {
   // used to serialize the user for the session
@@ -39,6 +42,7 @@ const socialAuth = () => {
           userInfo.name = user.name;
           userInfo.picture = user.picture;
         }
+        userInfo._doc.token = createJWT(userInfo._id);
         return cb(null, userInfo);
       });
     },
@@ -66,6 +70,7 @@ const socialAuth = () => {
           userInfo.name = user.name;
           userInfo.picture = user.picture;
         }
+        userInfo._doc.token = createJWT(userInfo._id);
         return cb(null, userInfo);
       });
     },
@@ -93,6 +98,7 @@ const socialAuth = () => {
           userInfo.name = user.name;
           userInfo.picture = user.picture;
         }
+        userInfo._doc.token = createJWT(userInfo._id);
         return cb(null, userInfo);
       });
     },
@@ -120,6 +126,7 @@ const socialAuth = () => {
           userInfo.name = user.name;
           userInfo.picture = user.picture;
         }
+        userInfo._doc.token = createJWT(userInfo._id);
         return cb(null, userInfo);
       });
     },
@@ -146,6 +153,7 @@ const socialAuth = () => {
           userInfo.name = user.name;
           userInfo.picture = user.picture;
         }
+        userInfo._doc.token = createJWT(userInfo._id);
         return cb(null, userInfo);
       });
     },
