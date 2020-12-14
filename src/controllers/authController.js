@@ -2,6 +2,7 @@ import catchAsync from '../middlewares/catchAsync';
 import AppError from '../../utils/AppError';
 import User from '../models/User';
 import sendSMS from '../middlewares/twilioSMS';
+import sendEmailOTP from '../middlewares/emailOTP';
 import {
   createJWT,
 } from '../middlewares/jwtToken';
@@ -20,6 +21,7 @@ const sendMessage = (res, type, statusCode, message) => {
   });
 };
 
+// Phone verification
 const smsAuthentication = catchAsync(async (req, res, next) => {
   res.setHeader('Content-type', 'application/json');
 
@@ -78,7 +80,66 @@ const smsVerify = catchAsync(async (req, res, next) => {
   sendData(res, userInfo);
 });
 
+// Email verification
+const emailAuthentication = catchAsync(async (req, res, next) => {
+  res.setHeader('Content-type', 'application/json');
+
+  const {
+    name,
+    email,
+    password,
+  } = req.body;
+  if (!name) return next(new AppError('Provide your name.', 400));
+  if (!email) return next(new AppError('Provide your email.', 400));
+  if (!password) return next(new AppError('Provide your password.', 400));
+
+  let userInfo = await User.findOne({ email });
+  if (userInfo) return next(new AppError('Already use this email.', 400));
+
+  const otpInfo = await sendEmailOTP(email);
+  const reqBody = {
+    ...req.body,
+    otp: otpInfo.OTP,
+    createdAtOTP: otpInfo.createdAtOTP,
+  };
+  userInfo = await User.create(reqBody);
+  if (!userInfo) return next(new AppError('Try again.'));
+  sendMessage(res, 'ok', 201, `Send an OTP code to ${email}`);
+});
+
+const emailVerify = catchAsync(async (req, res, next) => {
+  res.setHeader('Content-type', 'application/json');
+
+  const {
+    otp,
+    email,
+  } = req.body;
+
+  let userInfo = await User.findOne({
+    email,
+    otp,
+  }).select('createdAtOTP');
+
+  if (!userInfo) next(new AppError('Provide valid verification code.', 400));
+
+  const currentTime = new Date();
+  const difference = currentTime - userInfo.createdAtOTP;
+  if (difference > 300000) return next(new AppError('Expire OTP code.', 403));
+
+  userInfo = await User.findByIdAndUpdate(userInfo._id, {
+    active: true,
+  }, {
+    new: true,
+    runValidators: true,
+  });
+
+  userInfo._doc.token = createJWT(userInfo._id);
+  sendData(res, userInfo);
+});
+
 export {
   smsAuthentication,
   smsVerify,
+  emailAuthentication,
+  emailVerify,
 };

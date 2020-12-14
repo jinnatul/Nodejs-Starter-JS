@@ -8,7 +8,6 @@ import globalErrorHandler from './src/controllers/errorController';
 import router from './src/routers/router';
 import authConfig from './src/controllers/socialController';
 import AppError from './utils/AppError';
-import sendSMS from './src/middlewares/twilioSMS';
 
 const app = express();
 

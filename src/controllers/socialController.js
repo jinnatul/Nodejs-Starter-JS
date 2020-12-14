@@ -132,6 +132,7 @@ const socialAuth = () => {
     },
   ));
 
+  // Facebook
   passport.use(new FacebookStrategy(
     {
       clientID: process.env.FACEBOOK_CLIENT_ID,

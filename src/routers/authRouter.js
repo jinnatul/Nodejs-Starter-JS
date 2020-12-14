@@ -2,7 +2,9 @@ import express from 'express';
 import passport from 'passport';
 import {
   smsAuthentication,
-  smsVerify
+  smsVerify,
+  emailAuthentication,
+  emailVerify,
 } from '../controllers/authController';
 
 const router = express.Router();
@@ -74,6 +76,10 @@ router.get('/facebook/callback',
 // Phone verification
 router.post('/sms', smsAuthentication);
 router.post('/sms/verify', smsVerify);
+
+// Email verification
+router.post('/email', emailAuthentication);
+router.post('/email/verify', emailVerify);
 
 /* Social authentication */
 router.get('/success', (req, res) => res.json({
