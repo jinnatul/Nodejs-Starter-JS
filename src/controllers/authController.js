@@ -1,8 +1,8 @@
 import catchAsync from '../middlewares/catchAsync';
 import AppError from '../../utils/AppError';
 import User from '../models/User';
-import sendSMS from '../middlewares/twilioSMS';
-import sendEmailOTP from '../middlewares/emailOTP';
+import sendSMS from '../../config/twilioSMS';
+import sendEmailOTP from '../../config/emailOTP';
 import {
   createJWT,
 } from '../middlewares/jwtToken';

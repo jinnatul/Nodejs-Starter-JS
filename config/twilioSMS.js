@@ -1,4 +1,4 @@
-import '../../config/ImportEnv';
+import './ImportEnv';
 import configTwilio from 'twilio';
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;

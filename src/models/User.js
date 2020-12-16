@@ -17,6 +17,9 @@ const userSchema = new mongoose.Schema({
   picture: {
     type: String,
   },
+  pictureId: {
+    type: String,
+  },
   phone: {
     type: String,
   },
@@ -63,10 +66,12 @@ userSchema.pre('save', async function (next) {
 });
 
 // get User from email
-// userSchema.pre('save', function (next) {
-//   this.userName = this.email.match(/^([^@]*)@/)[1];
-//   next();
-// });
+userSchema.pre('save', function (next) {
+  if (this.email) {
+    this.userName = this.email.match(/^([^@]*)@/)[1];
+  }
+  next();
+});
 
 if (!mongoose.models.User) {
   mongoose.model('User', userSchema);

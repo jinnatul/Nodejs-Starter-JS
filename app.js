@@ -4,6 +4,7 @@ import flash from 'connect-flash';
 import session from 'express-session';
 import apiMonitoring from 'express-status-monitor';
 import morgan from 'morgan';
+import fileUpload from 'express-fileupload';
 import globalErrorHandler from './src/controllers/errorController';
 import router from './src/routers/router';
 import authConfig from './src/controllers/socialController';
@@ -11,8 +12,12 @@ import AppError from './utils/AppError';
 
 const app = express();
 
-// Access json data
+// parse application/json
 app.use(express.json());
+
+app.use(fileUpload({
+  useTempFiles: true,
+}));
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
