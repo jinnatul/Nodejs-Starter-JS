@@ -19,7 +19,8 @@ const sendMessage = (res, type, statusCode, message) => {
   });
 };
 
-// cloudinary picture upload
+/*  Cloudinary  */
+// picture upload
 const pictureUploadCloudinary = catchAsync(async (req, res, next) => {
   res.setHeader('Content-type', 'application/json');
 
@@ -50,7 +51,21 @@ const pictureUploadCloudinary = catchAsync(async (req, res, next) => {
   }
 });
 
-// Imgur picture upload
+// picture remove
+const pictureRemoveFromCloudinary = catchAsync(async (req, res, next) => {
+  res.setHeader('Content-type', 'application/json');
+
+  const imageId = req.params.id;
+  cloudinary.uploader.destroy(imageId, (data) => {
+    if (data.result !== 'ok') {
+      return next(new AppError(`Invalid image id: ${imageId}`, 400));
+    }
+    sendMessage(res, 'ok', 200, 'Picture remove successfully');
+  });
+});
+
+/*  Imgur  */
+// picture upload
 const pictureUploadImgur = catchAsync(async (req, res, next) => {
   res.setHeader('Content-type', 'application/json');
 
@@ -81,7 +96,7 @@ const pictureUploadImgur = catchAsync(async (req, res, next) => {
   }
 });
 
-// Imgur picture remove
+// picture remove
 const pictureRemoveFromImgur = catchAsync(async (req, res, next) => {
   res.setHeader('Content-type', 'application/json');
 
@@ -89,7 +104,7 @@ const pictureRemoveFromImgur = catchAsync(async (req, res, next) => {
   Imgur.deleteImage(imageId).then(() => {
     sendMessage(res, 'ok', 200, 'Picture remove successfully');
   }).catch(() => {
-    next(new AppError('An unexpected error occurred while removing your image', 400));
+    next(new AppError(`Invalid image id: ${imageId}`, 400));
   });
 });
 
@@ -97,4 +112,5 @@ export {
   pictureUploadCloudinary,
   pictureUploadImgur,
   pictureRemoveFromImgur,
+  pictureRemoveFromCloudinary,
 };
