@@ -1,4 +1,5 @@
 import fs from 'fs';
+import Imgur from 'imgur';
 import catchAsync from '../middlewares/catchAsync';
 import AppError from '../../utils/AppError';
 import cloudinary from '../../config/cloudinary';
@@ -18,8 +19,8 @@ const sendMessage = (res, type, statusCode, message) => {
   });
 };
 
-// cloudinary image upload
-const fileUploadCloudinary = catchAsync(async (req, res, next) => {
+// cloudinary picture upload
+const pictureUploadCloudinary = catchAsync(async (req, res, next) => {
   res.setHeader('Content-type', 'application/json');
 
   const { email } = req.body;
@@ -49,6 +50,41 @@ const fileUploadCloudinary = catchAsync(async (req, res, next) => {
   }
 });
 
+// Imgur picture upload
+const pictureUploadImgur = catchAsync(async (req, res, next) => {
+  res.setHeader('Content-type', 'application/json');
+
+  const { email } = req.body;
+
+  let userInfo = await User.findOne({ email });
+  if (userInfo) {
+    let filePath = req.files.photo.tempFilePath;
+    Imgur.uploadFile(filePath).then(async (data) => {
+      // Remove file from temp directory
+      fs.unlinkSync(filePath);
+
+      const pictureInfo = {
+        picture: data.data.link,
+        pictureId: data.data.deletehash,
+      };
+
+      userInfo = await User.findByIdAndUpdate(userInfo._id, pictureInfo, {
+        new: true,
+        runValidators: true,
+      });
+      sendData(res, userInfo);
+    }).catch(() => {
+      next(new AppError('An unexpected error occurred while uploading your image', 400));
+    });
+  } else {
+    next(new AppError('Email not exist', 404));
+  }
+});
+
+
+
 export {
-  fileUploadCloudinary,
+  pictureUploadCloudinary,
+  pictureUploadImgur,
+  pictureRemoveFromImgur,
 };
