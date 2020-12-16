@@ -81,7 +81,17 @@ const pictureUploadImgur = catchAsync(async (req, res, next) => {
   }
 });
 
+// Imgur picture remove
+const pictureRemoveFromImgur = catchAsync(async (req, res, next) => {
+  res.setHeader('Content-type', 'application/json');
 
+  const imageId = req.params.id;
+  Imgur.deleteImage(imageId).then(() => {
+    sendMessage(res, 'ok', 200, 'Picture remove successfully');
+  }).catch(() => {
+    next(new AppError('An unexpected error occurred while removing your image', 400));
+  });
+});
 
 export {
   pictureUploadCloudinary,
