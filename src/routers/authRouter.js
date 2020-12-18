@@ -3,6 +3,7 @@ import passport from 'passport';
 import {
   smsAuthentication,
   smsVerify,
+  signInWithPhone,
   emailAuthentication,
   emailVerify,
 } from '../controllers/authController';
@@ -76,6 +77,7 @@ router.get('/facebook/callback',
 // Phone verification
 router.post('/sms', smsAuthentication);
 router.post('/sms/verify', smsVerify);
+router.post('/signin', signInWithPhone);
 
 // Email verification
 router.post('/email', emailAuthentication);

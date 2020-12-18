@@ -47,7 +47,7 @@ const smsAuthentication = catchAsync(async (req, res, next) => {
   };
   userInfo = await User.create(reqBody);
   if (!userInfo) return next(new AppError('Try again.'));
-  sendMessage(res, 'ok', 201, `Send an SMS verification code to ${phone}`);
+  return sendMessage(res, 'ok', 201, `Send an SMS verification code to ${phone}`);
 });
 
 const smsVerify = catchAsync(async (req, res, next) => {
@@ -77,7 +77,34 @@ const smsVerify = catchAsync(async (req, res, next) => {
   });
 
   userInfo._doc.token = createJWT(userInfo._id);
-  sendData(res, userInfo);
+  return sendData(res, userInfo);
+});
+
+const signInWithPhone = catchAsync(async (req, res, next) => {
+  res.setHeader('Content-type', 'application/json');
+
+  const {
+    phone,
+    password,
+  } = req.body;
+
+  if (!phone) return next(new AppError('Provide your phone.', 400));
+  if (!password) return next(new AppError('Provide your password.', 400));
+
+  // Check if user exists & password is correct
+  const userInfo = await User.findOne({
+    phone,
+  }).select('+password');
+  if (!userInfo || !(await userInfo.comparePassword(
+    password,
+    userInfo.password,
+  ))) {
+    next(new AppError('Incorrect crediantial.', 400));
+  }
+
+  userInfo._doc.token = createJWT(userInfo._id);
+  userInfo.password = undefined;
+  return sendData(res, userInfo);
 });
 
 // Email verification
@@ -104,7 +131,7 @@ const emailAuthentication = catchAsync(async (req, res, next) => {
   };
   userInfo = await User.create(reqBody);
   if (!userInfo) return next(new AppError('Try again.'));
-  sendMessage(res, 'ok', 201, `Send an OTP code to ${email}`);
+  return sendMessage(res, 'ok', 201, `Send an OTP code to ${email}`);
 });
 
 const emailVerify = catchAsync(async (req, res, next) => {
@@ -134,12 +161,13 @@ const emailVerify = catchAsync(async (req, res, next) => {
   });
 
   userInfo._doc.token = createJWT(userInfo._id);
-  sendData(res, userInfo);
+  return sendData(res, userInfo);
 });
 
 export {
   smsAuthentication,
   smsVerify,
+  signInWithPhone,
   emailAuthentication,
   emailVerify,
 };
